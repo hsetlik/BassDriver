@@ -12,7 +12,7 @@ juce_add_plugin(${PROJECT_NAME}
     NEEDS_MIDI_INPUT FALSE # may change this
     NEEDS_MIDI_OUTPUT FALSE # may change this
     PLUGIN_MANUFACTURER_CODE STLK # change this
-    PLUGIN_CODE EXPL # change this
+    PLUGIN_CODE BDVR # change this
     FORMATS Standalone VST3  AU # may change this
     PRODUCT_NAME "BassDriver" # change this
     COPY_PLUGIN_AFTER_BUILD TRUE 
@@ -21,6 +21,7 @@ juce_add_plugin(${PROJECT_NAME}
 # Sets the source files of the plugin project.
 target_sources(${PROJECT_NAME}
     PRIVATE
+# Shared Files----------------------------
         source/Identifiers.cpp
         source/Common.cpp
         source/PluginEditor.cpp
@@ -29,6 +30,16 @@ target_sources(${PROJECT_NAME}
         ${INCLUDE_DIR}/Common.h
         ${INCLUDE_DIR}/PluginEditor.h
         ${INCLUDE_DIR}/PluginProcessor.h
+
+# GUI files------------------------------
+        ${INCLUDE_DIR}/GUI/ParamSlider.h
+        ${INCLUDE_DIR}/GUI/DrivePanel.h
+        ${INCLUDE_DIR}/GUI/InputPanel.h
+        ${INCLUDE_DIR}/GUI/CompressorPanel.h
+        source/ParamSlider.cpp
+        source/DrivePanel.cpp
+        source/InputPanel.cpp
+        source/CompressorPanel.cpp
 )
 
 # Sets the include directories of the plugin project.

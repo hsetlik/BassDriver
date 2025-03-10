@@ -17,6 +17,14 @@ apvts::ParameterLayout ID::getParameterLayout() {
   frange_t dryRange = rangeWithCenter(0.0f, _dryMax, _dryCenter);
   layout.add(std::make_unique<juce::AudioParameterFloat>(
       ID::dryLevel.toString(), "Dry Level", dryRange, _dryCenter));
+
+  const float preGainMin = juce::Decibels::decibelsToGain(-3.0f);
+  const float preGainMax = juce::Decibels::decibelsToGain(9.0f);
+  const float preGainDefault = 1.0f;
+  frange_t preGainRange =
+      rangeWithCenter(preGainMin, preGainMax, preGainDefault);
+  layout.add(std::make_unique<juce::AudioParameterFloat>(
+      ID::preampGain.toString(), "Pre-gain", preGainRange, preGainDefault));
   // true = comp. first, false = sat. first
   layout.add(std::make_unique<juce::AudioParameterBool>(
       ID::stageOrder.toString(), "Effect Order", true));

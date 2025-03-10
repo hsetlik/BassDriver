@@ -17,6 +17,8 @@ typedef std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>
     slider_attach_ptr;
 typedef std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment>
     combo_attach_ptr;
+typedef std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment>
+    button_attach_ptr;
 typedef juce::NormalisableRange<float> frange_t;
 
 #define DECLARE_ID(name) const juce::Identifier name(#name);
@@ -29,6 +31,7 @@ DECLARE_ID(BassDriver_state)
 // Dry/common controls
 DECLARE_ID(dryLevel)
 DECLARE_ID(stageOrder)
+DECLARE_ID(preampGain)
 
 // Saturation stage-----------------------
 DECLARE_ID(SAT_active)
