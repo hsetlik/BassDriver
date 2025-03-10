@@ -31,6 +31,17 @@ target_sources(${PROJECT_NAME}
         ${INCLUDE_DIR}/PluginEditor.h
         ${INCLUDE_DIR}/PluginProcessor.h
 
+# Audio files------------------------------
+        ${INCLUDE_DIR}/Audio/IIRFilter.h
+        ${INCLUDE_DIR}/Audio/CompressorDSP.h
+        ${INCLUDE_DIR}/Audio/SaturatorDSP.h
+        ${INCLUDE_DIR}/Audio/MasterDSP.h
+        ${INCLUDE_DIR}/Audio/ValueSmoother.h
+        source/IIRFilter.cpp
+        source/CompressorDSP.cpp
+        source/SaturatorDSP.cpp
+        source/MasterDSP.cpp
+
 # GUI files------------------------------
         ${INCLUDE_DIR}/GUI/ParamSlider.h
         ${INCLUDE_DIR}/GUI/DrivePanel.h
