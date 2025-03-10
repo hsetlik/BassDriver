@@ -1,5 +1,5 @@
 #pragma once
-/* This namespace is were all the string identifiers for
+/* This namespace is where all the string identifiers for
  * parameters, components, and anything else should live.
  * Simply use the `DECLARE_ID` macro and never worry about
  * misspelling a string literal again.
@@ -21,9 +21,30 @@ typedef juce::NormalisableRange<float> frange_t;
 
 #define DECLARE_ID(name) const juce::Identifier name(#name);
 
+frange_t rangeWithCenter(float start, float end, float center);
 namespace ID {
 // top level ID for the apvts
 DECLARE_ID(BassDriver_state)
+
+// Dry/common controls
+DECLARE_ID(dryLevel)
+DECLARE_ID(stageOrder)
+
+// Saturation stage-----------------------
+DECLARE_ID(SAT_active)
+DECLARE_ID(SAT_inGain)
+DECLARE_ID(SAT_clipAmt)
+DECLARE_ID(SAT_outFilter)
+DECLARE_ID(SAT_outGain)
+
+// Compression stage----------------------
+DECLARE_ID(COMP_active)
+DECLARE_ID(COMP_inGain)
+DECLARE_ID(COMP_thresh)
+DECLARE_ID(COMP_ratio)
+DECLARE_ID(COMP_attack)
+DECLARE_ID(COMP_release)
+DECLARE_ID(COMP_outGain)
 
 apvts::ParameterLayout getParameterLayout();
 }  // namespace ID
