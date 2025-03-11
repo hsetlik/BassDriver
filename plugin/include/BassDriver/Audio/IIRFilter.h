@@ -140,6 +140,12 @@ private:
   bool filtersPrepared = false;
   // same idea as prepareFilter() above
   void prepareCascade();
+  // freq smoothing stuff
+  bool useFreqSmoothing = false;
+  bool freqSmoothingActive = false;
+  float targetFreq;
+  float smoothedFreq;
+  const float smoothFactor = 0.5f;
 
 public:
   CascadeIIR() = default;
@@ -148,4 +154,5 @@ public:
   void setFrequency(float hz);
   void prepare(double sampleFreq);
   float process(float input);
+  void setFreqSmoothing(bool useSmoothing) { useFreqSmoothing = useSmoothing; }
 };

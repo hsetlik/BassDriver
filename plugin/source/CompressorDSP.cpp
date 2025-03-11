@@ -36,13 +36,11 @@ float RMSMeter::process(float input) {
 void EnvelopeFollower::setAttackHz(float norm) {
   static frange_t atkRange(3.0f, 50.0f);
   attackHz = atkRange.convertFrom0to1(1.0f - norm);
-  atkFilter.setFrequency(attackHz);
 }
 
 void EnvelopeFollower::setReleaseHz(float norm) {
   static frange_t rlsRange(1.0f, 40.0f);
   releaseHz = rlsRange.convertFrom0to1(1.0f - norm);
-  rlsFilter.setFrequency(releaseHz);
 }
 
 void EnvelopeFollower::init(double sampleRate) {
@@ -50,13 +48,14 @@ void EnvelopeFollower::init(double sampleRate) {
   aParams.cutoff = 35.0f;
   aParams.order = 4;
   atkFilter.setParams(aParams);
+  atkFilter.setFreqSmoothing(true);
   atkFilter.prepare(sampleRate);
 
   auto rParams = *rlsFilter.getParams();
   rParams.cutoff = 35.0f;
   rParams.order = 4;
   rlsFilter.setParams(rParams);
-  atkFilter.prepare(sampleRate);
+  rlsFilter.prepare(sampleRate);
 
   chunkMeter.setWindowSize(500);
 }
@@ -69,9 +68,10 @@ void EnvelopeFollower::update(float atk, float rls) {
 float EnvelopeFollower::process(float input) {
   currentRMSLevel = chunkMeter.process(input);
   float p = pd.process(input);
+  float freq = chunkMeter.isGainIncreasing() ? attackHz : releaseHz;
+  atkFilter.setFrequency(freq);
   float aValue = atkFilter.process(p);
-  float rValue = rlsFilter.process(p);
-  return chunkMeter.isGainIncreasing() ? aValue : rValue;
+  return aValue;
 }
 
 //=================================================================================

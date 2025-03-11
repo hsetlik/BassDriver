@@ -191,9 +191,14 @@ void CascadeIIR::setParams(cascade_iir_params_t other) {
 }
 
 void CascadeIIR::setFrequency(float hz) {
-  if (!fequal(hz, params.cutoff)) {
-    params.cutoff = hz;
-    prepareCascade();
+  if (!useFreqSmoothing) {
+    if (!fequal(hz, params.cutoff)) {
+      params.cutoff = hz;
+      prepareCascade();
+    }
+  } else {
+    targetFreq = hz;
+    freqSmoothingActive = !fequal(smoothedFreq, targetFreq);
   }
 }
 
@@ -204,6 +209,12 @@ void CascadeIIR::prepare(double sr) {
 }
 
 float CascadeIIR::process(float input) {
+  if (freqSmoothingActive) {
+    smoothedFreq = flerp(targetFreq, smoothedFreq, smoothFactor);
+    params.cutoff = smoothedFreq;
+    prepareCascade();
+    freqSmoothingActive = !fequal(smoothedFreq, targetFreq);
+  }
   float out = input;
   for (int i = 0; i < filters.size(); i++) {
     out = filters[i]->processSample(out);

@@ -32,14 +32,16 @@ void CompressorPanel::resized() {
   auto lBounds = bBounds.removeFromTop(18.0f);
   sectionLabel.setBounds(lBounds.removeFromLeft(65.0f).toNearestInt());
   activeBtn.setBounds(lBounds.toNearestInt());
-  const float dX = bBounds.getWidth() / 3.0f;
+  float dX = bBounds.getWidth() / 3.0f;
   const float dY = bBounds.getHeight() / 3.0f;
   auto lColumn = bBounds.removeFromLeft(dX);
   inGainSlider.setBounds(lColumn.removeFromTop(dY).toNearestInt());
   threshSlider.setBounds(lColumn.removeFromTop(dY).toNearestInt());
   ratioSlider.setBounds(lColumn.toNearestInt());
   auto bRow = bBounds.removeFromBottom(dY);
+  dX = bRow.getWidth() / 3.0f;
   attackSlider.setBounds(bRow.removeFromLeft(dX).toNearestInt());
-  releaseSlider.setBounds(bRow.toNearestInt());
+  releaseSlider.setBounds(bRow.removeFromLeft(dX).toNearestInt());
+  outGainSlider.setBounds(bRow.toNearestInt());
   graph.setBounds(bBounds.toNearestInt());
 }
