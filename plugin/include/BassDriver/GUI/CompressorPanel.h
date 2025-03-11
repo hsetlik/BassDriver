@@ -2,8 +2,9 @@
 
 #include "ParamSlider.h"
 
-class CompressorPanel : public juce::Component {
+class CompressorPanel : public juce::Component, juce::Button::Listener {
 private:
+  juce::Label sectionLabel;
   ParamToggle activeBtn;
   LabeledParamSlider inGainSlider;
   LabeledParamSlider threshSlider;
@@ -19,4 +20,5 @@ private:
 public:
   CompressorPanel(apvts& state);
   void resized() override;
+  void buttonClicked(juce::Button* b) override;
 };
