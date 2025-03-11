@@ -5,10 +5,9 @@
 void Saturator::init(double sampleRate) {
   // 1. set up the input filter
   auto fParams = *filter.getParams();
-  fParams.filterType = iir_type_t::NormalLowPass;
-  fParams.frequency = 400.0f;
+  fParams.filterType = iir_cascade_t::ButterworthLowPass1;
+  fParams.cutoff = 400.0f;
   filter.setParams(fParams);
-  filter.setFreqSmoothing(true);
   filter.prepare(sampleRate);
 
   inputGain = juce::Decibels::decibelsToGain(15.0f);
@@ -51,7 +50,7 @@ float Saturator::processSample(float input) {
   if (!std::signbit(s) && s > pThresh) {
     s = pThresh + ((s - pThresh) * clipAmt);
   } else if (std::signbit(s) && s < nThresh) {
-    s = nThresh + ((s - nThresh) * clipAmt);
+    s = nThresh - ((s - nThresh) * clipAmt);
   }
   // 3. filter
   s = filter.process(s);

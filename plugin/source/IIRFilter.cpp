@@ -190,6 +190,13 @@ void CascadeIIR::setParams(cascade_iir_params_t other) {
     prepareCascade();
 }
 
+void CascadeIIR::setFrequency(float hz) {
+  if (!fequal(hz, params.cutoff)) {
+    params.cutoff = hz;
+    prepareCascade();
+  }
+}
+
 void CascadeIIR::prepare(double sr) {
   sampleRate = sr;
   prepareCascade();
@@ -242,9 +249,17 @@ void CascadeIIR::prepareCascade() {
       break;
   }
 
-  // 2. repopulate the OwnedArray with the new filters
-  filters.clear();
-  for (int i = 0; i < arr.size(); i++) {
-    filters.add(new iir_core_t(arr[i]));
+  // 2. Initialize/re-initialize the filters if we don't have the
+  // correct number
+  if (filters.size() != arr.size()) {
+    filters.clear();
+    for (int i = 0; i < arr.size(); i++) {
+      filters.add(new iir_core_t(arr[i]));
+    }
+  } else {  // 3. If we already have the right # of filters,
+    // simply switch out the coefficients rather than re-initializing
+    for (int i = 0; i < arr.size(); ++i) {
+      filters[i]->coefficients = arr[i];
+    }
   }
 }

@@ -145,6 +145,7 @@ public:
   CascadeIIR() = default;
   cascade_iir_params_t* getParams() { return &params; }
   void setParams(cascade_iir_params_t other);
+  void setFrequency(float hz);
   void prepare(double sampleFreq);
   float process(float input);
 };

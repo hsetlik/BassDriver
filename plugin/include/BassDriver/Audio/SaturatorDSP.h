@@ -6,7 +6,7 @@
 class Saturator {
 private:
   // output filter stuff
-  SingleIIR filter;
+  CascadeIIR filter;
   // parameters from the gui
   float inputGain;
   float clipAmt;
