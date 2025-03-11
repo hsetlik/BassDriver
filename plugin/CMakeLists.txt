@@ -47,10 +47,12 @@ target_sources(${PROJECT_NAME}
         ${INCLUDE_DIR}/GUI/DrivePanel.h
         ${INCLUDE_DIR}/GUI/InputPanel.h
         ${INCLUDE_DIR}/GUI/CompressorPanel.h
+        ${INCLUDE_DIR}/GUI/CompressorGraph.h
         source/ParamSlider.cpp
         source/DrivePanel.cpp
         source/InputPanel.cpp
         source/CompressorPanel.cpp
+        source/CompressorGraph.cpp
 )
 
 # Sets the include directories of the plugin project.

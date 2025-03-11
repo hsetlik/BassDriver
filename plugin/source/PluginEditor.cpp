@@ -8,14 +8,14 @@ BassDriverProcessorEditor::BassDriverProcessorEditor(
       processorRef(p),
       inPanel(p.tree),
       dPanel(p.tree),
-      cPanel(p.tree) {
+      cPanel(p.tree, p.core.getCompressor()) {
   juce::ignoreUnused(processorRef);
   addAndMakeVisible(&inPanel);
   addAndMakeVisible(&dPanel);
   addAndMakeVisible(&cPanel);
   // Make sure that before the constructor has finished, you've set the
   // editor's size to whatever you need it to be.
-  setSize(800, 600);
+  setSize(1000, 620);
 }
 
 BassDriverProcessorEditor::~BassDriverProcessorEditor() {}
@@ -33,6 +33,8 @@ void BassDriverProcessorEditor::resized() {
   auto iBounds = fBounds.removeFromTop(inPanelHeight);
   inPanel.setBounds(iBounds.toNearestInt());
   auto dBounds = fBounds.removeFromLeft(fBounds.getWidth() * 0.5f);
+  // cbounds = 500 x 500
+  // each slider/graph will be 167 X 167
   dPanel.setBounds(dBounds.toNearestInt());
   cPanel.setBounds(fBounds.toNearestInt());
 }

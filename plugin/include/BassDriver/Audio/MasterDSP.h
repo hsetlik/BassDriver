@@ -24,6 +24,7 @@ public:
   void init(double sampleRate);
   void updateParams(apvts& tree);
   void processChunk(float*, int numSamples);
+  Compressor* getCompressor() { return &comp; }
 
 private:
   // helpers

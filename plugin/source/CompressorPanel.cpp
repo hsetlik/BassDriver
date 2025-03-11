@@ -1,14 +1,16 @@
 #include "BassDriver/GUI/CompressorPanel.h"
 #include "BassDriver/Identifiers.h"
 
-CompressorPanel::CompressorPanel(apvts& state)
-    : activeBtn(state, ID::COMP_active.toString()),
+CompressorPanel::CompressorPanel(apvts& state, Compressor* c)
+    : graph(c),
+      activeBtn(state, ID::COMP_active.toString()),
       inGainSlider(state, ID::COMP_inGain.toString()),
       threshSlider(state, ID::COMP_thresh.toString()),
       ratioSlider(state, ID::COMP_ratio.toString()),
       attackSlider(state, ID::COMP_attack.toString()),
       releaseSlider(state, ID::COMP_release.toString()),
       outGainSlider(state, ID::COMP_outGain.toString()) {
+  addAndMakeVisible(graph);
   addAndMakeVisible(activeBtn);
   activeBtn.addListener(this);
   sectionLabel.setText("Compressor", juce::dontSendNotification);
@@ -30,12 +32,14 @@ void CompressorPanel::resized() {
   auto lBounds = bBounds.removeFromTop(18.0f);
   sectionLabel.setBounds(lBounds.removeFromLeft(65.0f).toNearestInt());
   activeBtn.setBounds(lBounds.toNearestInt());
-  auto tBounds = bBounds.removeFromTop(bBounds.getHeight() / 2.0f);
-  const float dX = tBounds.getWidth() / 3.0f;
-  inGainSlider.setBounds(tBounds.removeFromLeft(dX).toNearestInt());
-  threshSlider.setBounds(tBounds.removeFromLeft(dX).toNearestInt());
-  ratioSlider.setBounds(tBounds.toNearestInt());
-  attackSlider.setBounds(bBounds.removeFromLeft(dX).toNearestInt());
-  releaseSlider.setBounds(bBounds.removeFromLeft(dX).toNearestInt());
-  outGainSlider.setBounds(bBounds.toNearestInt());
+  const float dX = bBounds.getWidth() / 3.0f;
+  const float dY = bBounds.getHeight() / 3.0f;
+  auto lColumn = bBounds.removeFromLeft(dX);
+  inGainSlider.setBounds(lColumn.removeFromTop(dY).toNearestInt());
+  threshSlider.setBounds(lColumn.removeFromTop(dY).toNearestInt());
+  ratioSlider.setBounds(lColumn.toNearestInt());
+  auto bRow = bBounds.removeFromBottom(dY);
+  attackSlider.setBounds(bRow.removeFromLeft(dX).toNearestInt());
+  releaseSlider.setBounds(bRow.toNearestInt());
+  graph.setBounds(bBounds.toNearestInt());
 }

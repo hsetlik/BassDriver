@@ -61,6 +61,7 @@ public:
   void init(double sampleRate);
   void update(float atk, float rls);
   float process(float input);
+  float getRMSLevel() const { return currentRMSLevel; }
 };
 
 //=================================================================================
@@ -68,6 +69,7 @@ public:
 class Compressor {
 private:
   EnvelopeFollower ef;
+  float envLevel = 0.0f;
   float currentGain;
 
   // params
@@ -82,4 +84,7 @@ public:
   void updateParams(apvts& tree);
   void processChunk(float* data, int numSamples);
   float processSample(float input);
+  // getters for the compression graph
+  float currentInputLevelNorm();
+  float currentGainReductionDB();
 };

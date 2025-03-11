@@ -120,7 +120,15 @@ static float gainForLevel(float level, float thresh, float ratio) {
 
 float Compressor::processSample(float input) {
   float s = input * inGain;
-  float level = ef.process(s);
-  currentGain = gainForLevel(level, threshold, ratio);
+  envLevel = ef.process(s);
+  currentGain = gainForLevel(envLevel, threshold, ratio);
   return s * currentGain * outGain;
+}
+
+float Compressor::currentGainReductionDB() {
+  return juce::Decibels::gainToDecibels(currentGain);
+}
+
+float Compressor::currentInputLevelNorm() {
+  return envLevel;
 }
