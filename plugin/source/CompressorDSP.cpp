@@ -108,7 +108,7 @@ void Compressor::updateParams(apvts& tree) {
 
 void Compressor::processChunk(float* data, int numSamples) {
   for (int i = 0; i < numSamples; ++i)
-    data[i] = process(data[i]);
+    data[i] = processSample(data[i]);
 }
 
 static float gainForLevel(float level, float thresh, float ratio) {
@@ -118,7 +118,7 @@ static float gainForLevel(float level, float thresh, float ratio) {
   return juce::Decibels::decibelsToGain(dbOver * -ratio);
 }
 
-float Compressor::process(float input) {
+float Compressor::processSample(float input) {
   float s = input * inGain;
   float level = ef.process(s);
   currentGain = gainForLevel(level, threshold, ratio);

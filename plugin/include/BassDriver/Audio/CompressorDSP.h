@@ -81,7 +81,5 @@ public:
   void init(double sampleRate);
   void updateParams(apvts& tree);
   void processChunk(float* data, int numSamples);
-
-private:
-  float process(float input);
+  float processSample(float input);
 };

@@ -19,3 +19,6 @@ inline float flerp(float a, float b, float t) {
 inline bool fequal(float a, float b, float epsilon = 0.001f) {
   return std::fabs(a - b) < epsilon;
 }
+
+// thread-safe shorthand for reading apvts boolean params
+bool readBoolTreeParam(apvts& tree, const juce::String& paramID);

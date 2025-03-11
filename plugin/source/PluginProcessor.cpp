@@ -71,17 +71,18 @@ const juce::String BassDriverAudioProcessor::getProgramName(int index) {
   return {};
 }
 
-void BassDriverAudioProcessor::changeProgramName(
-    int index,
-    const juce::String& newName) {
+void BassDriverAudioProcessor::changeProgramName(int index,
+                                                 const juce::String& newName) {
   juce::ignoreUnused(index, newName);
 }
 
 void BassDriverAudioProcessor::prepareToPlay(double sampleRate,
-                                                 int samplesPerBlock) {
+                                             int samplesPerBlock) {
   // Use this method as the place to do any pre-playback
   // initialisation that you need..
-  juce::ignoreUnused(sampleRate, samplesPerBlock);
+  juce::ignoreUnused(samplesPerBlock);
+  SampleRate::set(sampleRate);
+  core.init(sampleRate);
 }
 
 void BassDriverAudioProcessor::releaseResources() {
@@ -111,9 +112,8 @@ bool BassDriverAudioProcessor::isBusesLayoutSupported(
 #endif
 }
 
-void BassDriverAudioProcessor::processBlock(
-    juce::AudioBuffer<float>& buffer,
-    juce::MidiBuffer& midiMessages) {
+void BassDriverAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer,
+                                            juce::MidiBuffer& midiMessages) {
   juce::ignoreUnused(midiMessages);
   juce::ScopedNoDenormals noDenormals;
   auto totalNumInputChannels = getTotalNumInputChannels();
@@ -128,17 +128,12 @@ void BassDriverAudioProcessor::processBlock(
   for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
     buffer.clear(i, 0, buffer.getNumSamples());
 
-  // This is the place where you'd normally do the guts of your plugin's
-  // audio processing...
-  // Make sure to reset the state if your inner loop is processing
-  // Alternatively, you can process the samples with the channels
-  // interleaved by keeping the same state.
-
-  for (int channel = 0; channel < totalNumInputChannels; ++channel) {
-    auto* channelData = buffer.getWritePointer(channel);
-    juce::ignoreUnused(channelData);
-    // ..do something to the data...
-  }
+  // update w param changes
+  core.updateParams(tree);
+  // we'll just do mono only for now
+  float* data = buffer.getWritePointer(0);
+  int length = buffer.getNumSamples();
+  core.processChunk(data, length);
 }
 
 bool BassDriverAudioProcessor::hasEditor() const {
@@ -159,7 +154,7 @@ void BassDriverAudioProcessor::getStateInformation(
 }
 
 void BassDriverAudioProcessor::setStateInformation(const void* data,
-                                                       int sizeInBytes) {
+                                                   int sizeInBytes) {
   // You should use this method to restore your parameters from this memory
   // block, whose contents will have been created by the getStateInformation()
   // call.
