@@ -1,6 +1,7 @@
 #include "BassDriver/Audio/SaturatorDSP.h"
 #include "BassDriver/Audio/IIRFilter.h"
 #include "BassDriver/Identifiers.h"
+#include "juce_audio_basics/juce_audio_basics.h"
 
 void Saturator::init(double sampleRate) {
   // 1. set up the input filter
@@ -26,11 +27,11 @@ void Saturator::updateParams(apvts& tree) {
   const float _out =
       tree.getRawParameterValue(ID::SAT_inGain.toString())->load();
 
-  inputGain = _in;
+  inputGain = juce::Decibels::decibelsToGain(_in);
   clipAmt = _clip;
   filterCutoff = _freq;
   filter.setFrequency(filterCutoff);
-  outputGain = _out;
+  outputGain = juce::Decibels::decibelsToGain(_out);
 }
 
 void Saturator::processChunk(float* data, int numSamples) {

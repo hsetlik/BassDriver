@@ -1,6 +1,7 @@
 #include "BassDriver/Audio/MasterDSP.h"
 #include "BassDriver/Common.h"
 #include "BassDriver/Identifiers.h"
+#include "juce_audio_basics/juce_audio_basics.h"
 
 void BassDriverCore::init(double sampleRate) {
   sat.init(sampleRate);
@@ -10,11 +11,14 @@ void BassDriverCore::init(double sampleRate) {
 void BassDriverCore::updateParams(apvts& tree) {
   const float _preGain =
       tree.getRawParameterValue(ID::preampGain.toString())->load();
+  const float _dryLevel =
+      tree.getRawParameterValue(ID::dryLevel.toString())->load();
   const bool _order = readBoolTreeParam(tree, ID::stageOrder.toString());
   const bool _satOn = readBoolTreeParam(tree, ID::SAT_active.toString());
   const bool _compOn = readBoolTreeParam(tree, ID::COMP_active.toString());
 
-  inputGain = _preGain;
+  inputGain = juce::Decibels::decibelsToGain(_preGain);
+  dryGain = juce::Decibels::decibelsToGain(_dryLevel);
 
   // translate to config enum
   if (_satOn && _compOn) {
@@ -37,8 +41,18 @@ void BassDriverCore::applyInputGain(float* buf, int numSamples) {
   }
 }
 
+void BassDriverCore::copyDryBuffer(float* buf, int numSamples) {
+  std::memcpy(dryBuf, buf, (size_t)numSamples * sizeof(float));
+}
+void BassDriverCore::addDryMix(float* buf, int numSamples) {
+  for (int i = 0; i < numSamples; ++i) {
+    buf[i] += (dryBuf[i] * dryGain);
+  }
+}
+
 void BassDriverCore::processChunk(float* data, int numSamples) {
   applyInputGain(data, numSamples);
+  copyDryBuffer(data, numSamples);
   switch (config) {
     case stage_config::bothCompFirst:
       comp.processChunk(data, numSamples);
@@ -59,4 +73,5 @@ void BassDriverCore::processChunk(float* data, int numSamples) {
     default:
       break;
   }
+  addDryMix(data, numSamples);
 }

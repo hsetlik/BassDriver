@@ -12,15 +12,16 @@ frange_t rangeWithCenter(float start, float end, float center) {
 apvts::ParameterLayout ID::getParameterLayout() {
   apvts::ParameterLayout layout;
   // add your parameters here
-  const float _dryMax = juce::Decibels::decibelsToGain(-6.0f);
-  const float _dryCenter = juce::Decibels::decibelsToGain(-24.0f);
-  frange_t dryRange = rangeWithCenter(0.0f, _dryMax, _dryCenter);
+  const float negInfinity = -120.0f;
+  const float _dryMax = -6.0f;
+  const float _dryCenter = -24.0f;
+  frange_t dryRange = rangeWithCenter(negInfinity, _dryMax, _dryCenter);
   layout.add(std::make_unique<juce::AudioParameterFloat>(
       ID::dryLevel.toString(), "Dry Level", dryRange, _dryCenter));
 
-  const float preGainMin = juce::Decibels::decibelsToGain(-3.0f);
-  const float preGainMax = juce::Decibels::decibelsToGain(9.0f);
-  const float preGainDefault = 1.0f;
+  const float preGainMin = -3.0f;
+  const float preGainMax = 12.0f;
+  const float preGainDefault = 3.0f;
   frange_t preGainRange =
       rangeWithCenter(preGainMin, preGainMax, preGainDefault);
   layout.add(std::make_unique<juce::AudioParameterFloat>(
@@ -32,9 +33,9 @@ apvts::ParameterLayout ID::getParameterLayout() {
   // Saturation params---------------------------------------------
   layout.add(std::make_unique<juce::AudioParameterBool>(
       ID::SAT_active.toString(), "Drive On", true));
-  const float satInMin = juce::Decibels::decibelsToGain(-24.0f);
-  const float satInMax = juce::Decibels::decibelsToGain(60.0f);
-  const float satInCenter = juce::Decibels::decibelsToGain(15.0f);
+  const float satInMin = -24.0f;
+  const float satInMax = 60.0f;
+  const float satInCenter = 15.0f;
   frange_t satInRange = rangeWithCenter(satInMin, satInMax, satInCenter);
   layout.add(std::make_unique<juce::AudioParameterFloat>(
       ID::SAT_inGain.toString(), "Gain", satInRange, satInCenter));
@@ -52,9 +53,9 @@ apvts::ParameterLayout ID::getParameterLayout() {
   layout.add(std::make_unique<juce::AudioParameterFloat>(
       ID::SAT_outFilter.toString(), "Tone", satFilterRange, satFilterDefault));
 
-  const float satOutMin = juce::Decibels::decibelsToGain(-34.0f);
-  const float satOutDefault = juce::Decibels::decibelsToGain(-6.0f);
-  frange_t satOutRange = rangeWithCenter(satOutMin, 1.0f, satOutDefault);
+  const float satOutMin = -34.0f;
+  const float satOutDefault = -6.0f;
+  frange_t satOutRange = rangeWithCenter(satOutMin, 0.0f, satOutDefault);
   layout.add(std::make_unique<juce::AudioParameterFloat>(
       ID::SAT_outGain.toString(), "Output Gain", satOutRange, satOutDefault));
 
@@ -62,16 +63,16 @@ apvts::ParameterLayout ID::getParameterLayout() {
   layout.add(std::make_unique<juce::AudioParameterBool>(
       ID::COMP_active.toString(), "Compressor On", true));
 
-  const float compInMax = juce::Decibels::decibelsToGain(6.0f);
-  const float compInMin = juce::Decibels::decibelsToGain(-24.0f);
-  const float compInDefault = 1.0f;
+  const float compInMax = 6.0f;
+  const float compInMin = -24.0f;
+  const float compInDefault = 0.0f;
   frange_t compInRange = rangeWithCenter(compInMin, compInMax, compInDefault);
   layout.add(std::make_unique<juce::AudioParameterFloat>(
       ID::COMP_inGain.toString(), "In gain", compInRange, compInDefault));
 
-  const float threshMax = juce::Decibels::decibelsToGain(-3.0f);
-  const float threshMin = juce::Decibels::decibelsToGain(-36.0f);
-  const float threshDefault = juce::Decibels::decibelsToGain(-20.0f);
+  const float threshMax = -3.0f;
+  const float threshMin = -36.0f;
+  const float threshDefault = -20.0f;
   frange_t threshRange = rangeWithCenter(threshMin, threshMax, threshDefault);
   layout.add(std::make_unique<juce::AudioParameterFloat>(
       ID::COMP_thresh.toString(), "Threshold", threshRange, threshDefault));
@@ -93,11 +94,11 @@ apvts::ParameterLayout ID::getParameterLayout() {
   layout.add(std::make_unique<juce::AudioParameterFloat>(
       ID::COMP_release.toString(), "Release", releaseRange, releaseDefault));
 
-  const float compOutMin = juce::Decibels::decibelsToGain(-18.0f);
-  const float compOutMax = juce::Decibels::decibelsToGain(10.0f);
-  frange_t compOutRange = rangeWithCenter(compOutMin, compOutMax, 1.0f);
+  const float compOutMin = -18.0f;
+  const float compOutMax = 12.0f;
+  frange_t compOutRange = rangeWithCenter(compOutMin, compOutMax, 0.0f);
   layout.add(std::make_unique<juce::AudioParameterFloat>(
-      ID::COMP_outGain.toString(), "Out gain", compOutRange, 1.0f));
+      ID::COMP_outGain.toString(), "Out gain", compOutRange, 0.0f));
 
   return layout;
 }

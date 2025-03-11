@@ -6,13 +6,17 @@
 // all the ways the two halves can be configured
 enum stage_config { bothCompFirst, bothSatFirst, compOnly, satOnly, neither };
 
+#define MAX_BUF_SIZE 2048
+
 class BassDriverCore {
 private:
   Saturator sat;
   Compressor comp;
 
+  float dryBuf[MAX_BUF_SIZE];
   // params
   float inputGain;
+  float dryGain;
   stage_config config = bothCompFirst;
 
 public:
@@ -24,4 +28,7 @@ public:
 private:
   // helpers
   void applyInputGain(float* buf, int numSamples);
+  void copyDryBuffer(float* buf, int numSamples);
+  void addDryMix(float* buf, int numSamples);
+  //
 };

@@ -100,10 +100,10 @@ void Compressor::updateParams(apvts& tree) {
       tree.getRawParameterValue(ID::COMP_outGain.toString())->load();
 
   ef.update(_attack, _release);
-  inGain = _in;
-  threshold = _thresh;
+  inGain = juce::Decibels::decibelsToGain(_in);
+  threshold = juce::Decibels::decibelsToGain(_thresh);
   ratio = _ratio;
-  outGain = _out;
+  outGain = juce::Decibels::decibelsToGain(_out);
 }
 
 void Compressor::processChunk(float* data, int numSamples) {
