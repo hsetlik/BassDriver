@@ -1,5 +1,7 @@
 #include "BassDriver/Audio/CompressorDSP.h"
 #include <cmath>
+#include "BassDriver/Identifiers.h"
+#include "juce_audio_basics/juce_audio_basics.h"
 
 float PeakDetector::process(float input) {
   static float prevInput = 0.0f;
@@ -18,7 +20,9 @@ float PeakDetector::process(float input) {
 float RMSMeter::process(float input) {
   if (windowPos == windowSize) {
     float meanSquare = currentSum / (float)windowSize;
+    windowLevelN2 = windowLevelN1;
     windowLevelN1 = std::sqrtf(meanSquare);
+    gainIncreasing = windowLevelN1 > windowLevelN2;
     windowPos = 0;
     currentSum = 0.0f;
   } else {
@@ -26,4 +30,97 @@ float RMSMeter::process(float input) {
   }
   currentSum += (input * input);
   return windowLevelN1;
+}
+
+//----------------------------------------------------
+void EnvelopeFollower::setAttackHz(float norm) {
+  static frange_t atkRange(3.0f, 50.0f);
+  attackHz = atkRange.convertFrom0to1(1.0f - norm);
+  atkFilter.setFrequency(attackHz);
+}
+
+void EnvelopeFollower::setReleaseHz(float norm) {
+  static frange_t rlsRange(1.0f, 40.0f);
+  releaseHz = rlsRange.convertFrom0to1(1.0f - norm);
+  rlsFilter.setFrequency(releaseHz);
+}
+
+void EnvelopeFollower::init(double sampleRate) {
+  auto aParams = *atkFilter.getParams();
+  aParams.cutoff = 35.0f;
+  aParams.order = 4;
+  atkFilter.setParams(aParams);
+  atkFilter.prepare(sampleRate);
+
+  auto rParams = *rlsFilter.getParams();
+  rParams.cutoff = 35.0f;
+  rParams.order = 4;
+  rlsFilter.setParams(rParams);
+  atkFilter.prepare(sampleRate);
+
+  chunkMeter.setWindowSize(500);
+}
+
+void EnvelopeFollower::update(float atk, float rls) {
+  setAttackHz(atk);
+  setReleaseHz(rls);
+}
+
+float EnvelopeFollower::process(float input) {
+  currentRMSLevel = chunkMeter.process(input);
+  float p = pd.process(input);
+  float aValue = atkFilter.process(p);
+  float rValue = rlsFilter.process(p);
+  return chunkMeter.isGainIncreasing() ? aValue : rValue;
+}
+
+//=================================================================================
+
+void Compressor::init(double sampleRate) {
+  ef.init(sampleRate);
+  ef.update(0.125f, 0.3f);
+  inGain = 1.0f;
+  threshold = juce::Decibels::decibelsToGain(-20.0f);
+  ratio = 1.5f;
+  outGain = 1.0f;
+}
+
+void Compressor::updateParams(apvts& tree) {
+  const float _in =
+      tree.getRawParameterValue(ID::COMP_inGain.toString())->load();
+  const float _attack =
+      tree.getRawParameterValue(ID::COMP_attack.toString())->load();
+  const float _release =
+      tree.getRawParameterValue(ID::COMP_release.toString())->load();
+  const float _ratio =
+      tree.getRawParameterValue(ID::COMP_ratio.toString())->load();
+  const float _thresh =
+      tree.getRawParameterValue(ID::COMP_thresh.toString())->load();
+  const float _out =
+      tree.getRawParameterValue(ID::COMP_outGain.toString())->load();
+
+  ef.update(_attack, _release);
+  inGain = _in;
+  threshold = _thresh;
+  ratio = _ratio;
+  outGain = _out;
+}
+
+void Compressor::processChunk(float* data, int numSamples) {
+  for (int i = 0; i < numSamples; ++i)
+    data[i] = process(data[i]);
+}
+
+static float gainForLevel(float level, float thresh, float ratio) {
+  if (level < thresh)
+    return 1.0f;
+  float dbOver = juce::Decibels::gainToDecibels(level / thresh);
+  return juce::Decibels::decibelsToGain(dbOver * -ratio);
+}
+
+float Compressor::process(float input) {
+  float s = input * inGain;
+  float level = ef.process(s);
+  currentGain = gainForLevel(level, threshold, ratio);
+  return s * currentGain * outGain;
 }

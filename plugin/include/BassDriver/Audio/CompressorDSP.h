@@ -29,12 +29,13 @@ private:
   float currentSum = 0.0f;
   int windowSize = RMS_WINDOW_DEFAULT;
   int windowPos = 0;
+  bool gainIncreasing = false;
 
 public:
   RMSMeter() = default;
   void setWindowSize(int size) { windowSize = size; }
   float process(float input);
-  bool isGainIncreasing();
+  bool isGainIncreasing() const { return gainIncreasing; }
 };
 
 // this uses the above
@@ -44,4 +45,43 @@ public:
 class EnvelopeFollower {
 private:
   RMSMeter chunkMeter;
+  float currentRMSLevel;
+  PeakDetector pd;
+  CascadeIIR atkFilter;
+  CascadeIIR rlsFilter;
+  float attackHz;
+  float releaseHz;
+  // helpers for the freq ranges
+  // here
+  void setAttackHz(float norm);
+  void setReleaseHz(float norm);
+
+public:
+  EnvelopeFollower() = default;
+  void init(double sampleRate);
+  void update(float atk, float rls);
+  float process(float input);
+};
+
+//=================================================================================
+
+class Compressor {
+private:
+  EnvelopeFollower ef;
+  float currentGain;
+
+  // params
+  float inGain;
+  float threshold;
+  float ratio;
+  float outGain;
+
+public:
+  Compressor() = default;
+  void init(double sampleRate);
+  void updateParams(apvts& tree);
+  void processChunk(float* data, int numSamples);
+
+private:
+  float process(float input);
 };
