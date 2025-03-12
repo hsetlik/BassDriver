@@ -132,3 +132,7 @@ float Compressor::currentGainReductionDB() {
 float Compressor::currentInputLevelNorm() {
   return envLevel;
 }
+
+float Compressor::currentInputLevelDB() {
+  return juce::Decibels::gainToDecibels(envLevel);
+}

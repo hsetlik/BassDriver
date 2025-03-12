@@ -7,11 +7,11 @@ CompressorGraph::CompressorGraph(Compressor* c)
     reductionPx.push(0);
     levelPx.push(GRAPH_WIDTH - 1);
   }
-  startTimerHz(30);
+  startTimerHz(45);
 }
 
 void CompressorGraph::timerCallback() {
-  float level = comp->currentInputLevelNorm();
+  float level = comp->currentInputLevelDB();
   float red = comp->currentGainReductionDB();
   updateImage(level, red);
   repaint();
@@ -27,8 +27,8 @@ void CompressorGraph::updateImage(float levelDb, float reductionDb) {
   float nReduction = reductionDb / -24.0f;
   int iReduction = (int)(nReduction * 80.0f);
   reductionPx.push(iReduction);
-  int iLevel = (int)(levelDb * 80.0f);
-  levelPx.push(167 - iLevel);
+  int iLevel = (int)((levelDb / -24.0f) * 80.0f);
+  levelPx.push(GRAPH_WIDTH - iLevel);
   // update the image
   static juce::Colour bkgnd(105, 105, 105);
   static juce::Colour lvlColor(64, 224, 208);

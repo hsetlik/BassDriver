@@ -86,5 +86,6 @@ public:
   float processSample(float input);
   // getters for the compression graph
   float currentInputLevelNorm();
+  float currentInputLevelDB();
   float currentGainReductionDB();
 };
