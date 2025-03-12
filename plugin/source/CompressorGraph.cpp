@@ -1,11 +1,11 @@
 #include "BassDriver/GUI/CompressorGraph.h"
 
 CompressorGraph::CompressorGraph(Compressor* c)
-    : comp(c), img(juce::Image::RGB, GRAPH_WIDTH, GRAPH_WIDTH, true) {
+    : comp(c), img(juce::Image::RGB, GRAPH_WIDTH, GRAPH_HEIGHT, true) {
   // zero out all the coord values
   for (int i = 0; i < GRAPH_WIDTH; ++i) {
     reductionPx.push(0);
-    levelPx.push(GRAPH_WIDTH - 1);
+    levelPx.push(GRAPH_HEIGHT - 1);
   }
   startTimerHz(45);
 }
@@ -25,9 +25,10 @@ void CompressorGraph::paint(juce::Graphics& g) {
 
 void CompressorGraph::updateImage(float levelDb, float reductionDb) {
   float nReduction = reductionDb / -24.0f;
-  int iReduction = (int)(nReduction * 80.0f);
+  const float redMax = 150.0f;
+  int iReduction = (int)(nReduction * redMax);
   reductionPx.push(iReduction);
-  int iLevel = (int)((levelDb / -24.0f) * 80.0f);
+  int iLevel = (int)((levelDb / -35.0f) * 80.0f);
   levelPx.push(GRAPH_WIDTH - iLevel);
   // update the image
   static juce::Colour bkgnd(105, 105, 105);
@@ -44,7 +45,7 @@ void CompressorGraph::updateImage(float levelDb, float reductionDb) {
       img.setPixelAt(x, y, bkgnd);
       ++y;
     }
-    while (y < GRAPH_WIDTH) {
+    while (y < GRAPH_HEIGHT) {
       img.setPixelAt(x, y, lvlColor);
       ++y;
     }

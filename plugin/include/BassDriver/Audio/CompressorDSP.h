@@ -1,4 +1,5 @@
 #pragma once
+#include "BassDriver/Audio/RollingAverage.h"
 #include "IIRFilter.h"
 
 // stuff for envelope following
@@ -14,13 +15,10 @@ class PeakDetector {
 private:
   float prevPhasePeak = 0.0f;
   float currentPeak = 0.0f;
-#ifdef PEAK_INTERNAL_FILTER
-  float outputVal = 0.0f;
-  const float filterAmt = 0.5f;
-#endif
+  RollingAverage filter;
 
 public:
-  PeakDetector() = default;
+  PeakDetector() : filter(65) {}
   float process(float input);
 };
 
@@ -56,6 +54,7 @@ private:
   PeakDetector pd;
   CascadeIIR atkFilter;
   CascadeIIR rlsFilter;
+  RollingAverage raFilter;
   float attackHz;
   float releaseHz;
   // helpers for the freq ranges
@@ -64,7 +63,7 @@ private:
   void setReleaseHz(float norm);
 
 public:
-  EnvelopeFollower() = default;
+  EnvelopeFollower() : raFilter(10) {}
   void init(double sampleRate);
   void update(float atk, float rls);
   float process(float input);

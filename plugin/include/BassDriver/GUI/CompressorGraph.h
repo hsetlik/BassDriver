@@ -2,7 +2,8 @@
 #include "../Common.h"
 #include "BassDriver/Audio/CompressorDSP.h"
 
-#define GRAPH_WIDTH 332
+#define GRAPH_WIDTH 400
+#define GRAPH_HEIGHT 360
 
 // simple ring buffer to hold our gain data
 class RingBuf {

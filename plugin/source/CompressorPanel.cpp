@@ -28,20 +28,26 @@ void CompressorPanel::buttonClicked(juce::Button* b) {
 }
 
 void CompressorPanel::resized() {
+  // the panel is 600px wide and 500px tall in total
   auto bBounds = getLocalBounds().toFloat();
-  auto lBounds = bBounds.removeFromTop(18.0f);
+  auto lBounds = bBounds.removeFromTop(20.0f);
   sectionLabel.setBounds(lBounds.removeFromLeft(65.0f).toNearestInt());
   activeBtn.setBounds(lBounds.toNearestInt());
-  float dX = bBounds.getWidth() / 3.0f;
-  const float dY = bBounds.getHeight() / 3.0f;
-  auto lColumn = bBounds.removeFromLeft(dX);
-  inGainSlider.setBounds(lColumn.removeFromTop(dY).toNearestInt());
-  threshSlider.setBounds(lColumn.removeFromTop(dY).toNearestInt());
-  ratioSlider.setBounds(lColumn.toNearestInt());
-  auto bRow = bBounds.removeFromBottom(dY);
-  dX = bRow.getWidth() / 3.0f;
-  attackSlider.setBounds(bRow.removeFromLeft(dX).toNearestInt());
-  releaseSlider.setBounds(bRow.removeFromLeft(dX).toNearestInt());
-  outGainSlider.setBounds(bRow.toNearestInt());
-  graph.setBounds(bBounds.toNearestInt());
+  // remaining area: 600 x 480
+  // dY = height / 4 = 120
+  // dX = width / 3 = 200
+  const int dY = 120;
+  const int dX = 200;
+  const int y0 = lBounds.toNearestInt().getBottom();
+  // left column
+  inGainSlider.setBounds(0, y0, dX, dY);
+  threshSlider.setBounds(0, y0 + dY, dX, dY);
+  ratioSlider.setBounds(0, y0 + dY * 2, dX, dY);
+  // bottom row
+  attackSlider.setBounds(dX, y0 + dY * 2, dX, dY);
+  releaseSlider.setBounds(dX * 2, y0 + dY * 2, dX, dY);
+  outGainSlider.setBounds(dX * 3, y0 + dY * 2, dX, dY);
+  // graph
+  // graph dimensions are 400 x 360
+  graph.setBounds(dX, y0, 2 * dX, 3 * dY);
 }

@@ -15,10 +15,7 @@ float PeakDetector::process(float input) {
   if (mag > currentPeak)
     currentPeak = mag;
 #ifdef PEAK_INTERNAL_FILTER
-  if (!fequal(prevPhasePeak, outputVal)) {
-    outputVal = flerp(prevPhasePeak, outputVal, filterAmt);
-  }
-  return outputVal;
+  return filter.process(prevPhasePeak);
 #else
   return prevPhasePeak;
 #endif
@@ -75,9 +72,9 @@ void EnvelopeFollower::update(float atk, float rls) {
 float EnvelopeFollower::process(float input) {
   currentRMSLevel = chunkMeter.process(input);
   float p = pd.process(input);
-  float freq = chunkMeter.isGainIncreasing() ? attackHz : releaseHz;
-  atkFilter.setFrequency(freq);
-  float aValue = atkFilter.process(p);
+  // float freq = chunkMeter.isGainIncreasing() ? attackHz : releaseHz;
+  // atkFilter.setFrequency(freq);
+  float aValue = raFilter.process(p);
   return aValue;
 }
 
@@ -121,8 +118,7 @@ void Compressor::processChunk(float* data, int numSamples) {
 static float gainForLevel(float level, float thresh, float ratio) {
   if (level < thresh)
     return 1.0f;
-  float dbOver = juce::Decibels::gainToDecibels(level / thresh);
-  return juce::Decibels::decibelsToGain(dbOver * -ratio);
+  return thresh + (level - thresh) / ratio;
 }
 
 float Compressor::processSample(float input) {

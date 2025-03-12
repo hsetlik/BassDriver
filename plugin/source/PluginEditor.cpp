@@ -45,9 +45,9 @@ void BassDriverProcessorEditor::resized() {
   auto iBounds = fBounds.removeFromTop(inPanelHeight);
   inPanel.setBounds(iBounds.toNearestInt());
   auto dBounds = fBounds.removeFromLeft(fBounds.getWidth() * 0.4f);
-  // cbounds = 500 x 500
-  // each slider/graph will be 167 X 167
+  // cbounds = 600 x 500
   dPanel.setBounds(dBounds.toNearestInt());
+
   cPanel.setBounds(fBounds.toNearestInt());
   // switch the EQ view on and off
   if (eqViewOpen) {
