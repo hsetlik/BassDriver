@@ -8,10 +8,12 @@ project(BassDriver VERSION 0.1.0)
 set(FONTS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/fonts")
 
 juce_add_binary_data(fontsLib
-HEADER_NAME BDFont.h
-NAMESPACE BDFont
+HEADER_NAME FontBinary.h
+NAMESPACE FontBinary
 SOURCES
 "${FONTS_DIR}/arial_narrow.ttf"
+"${FONTS_DIR}/bebas_neue_rg.otf"
+"${FONTS_DIR}/highway_gothic_condensed.ttf"
 "${FONTS_DIR}/kenyan_coffee_rg.otf"
 "${FONTS_DIR}/kenyan_coffee_rg_it.otf"
 )
