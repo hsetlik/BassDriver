@@ -14,7 +14,14 @@ float PeakDetector::process(float input) {
   float mag = std::fabs(input);
   if (mag > currentPeak)
     currentPeak = mag;
+#ifdef PEAK_INTERNAL_FILTER
+  if (!fequal(prevPhasePeak, outputVal)) {
+    outputVal = flerp(prevPhasePeak, outputVal, filterAmt);
+  }
+  return outputVal;
+#else
   return prevPhasePeak;
+#endif
 }
 
 float RMSMeter::process(float input) {

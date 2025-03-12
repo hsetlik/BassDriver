@@ -7,10 +7,17 @@
  * output filtering, it simply returns the largest absolute
  * value between its inputs previous two zero crossings
  * */
+
+#define PEAK_INTERNAL_FILTER
+
 class PeakDetector {
 private:
   float prevPhasePeak = 0.0f;
   float currentPeak = 0.0f;
+#ifdef PEAK_INTERNAL_FILTER
+  float outputVal = 0.0f;
+  const float filterAmt = 0.5f;
+#endif
 
 public:
   PeakDetector() = default;

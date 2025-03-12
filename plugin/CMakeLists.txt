@@ -3,6 +3,19 @@ cmake_minimum_required(VERSION 3.22)
 project(BassDriver VERSION 0.1.0)
 # Adding a directory with the library/application name as a subfolder of the
 # include folder is a good practice. It helps avoid name clashes later on.
+
+# set up a BinaryData with our fonts
+set(FONTS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/fonts")
+
+juce_add_binary_data(fontsLib
+HEADER_NAME BDFont.h
+NAMESPACE BDFont
+SOURCES
+"${FONTS_DIR}/arial_narrow.ttf"
+"${FONTS_DIR}/kenyan_coffee_rg.otf"
+"${FONTS_DIR}/kenyan_coffee_rg_it.otf"
+)
+
 set(INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/BassDriver")
 # Adds a plugin target (that's basically what the Projucer does).
 
@@ -48,11 +61,13 @@ target_sources(${PROJECT_NAME}
         ${INCLUDE_DIR}/GUI/InputPanel.h
         ${INCLUDE_DIR}/GUI/CompressorPanel.h
         ${INCLUDE_DIR}/GUI/CompressorGraph.h
+        ${INCLUDE_DIR}/GUI/CustomLookAndFeel.h
         source/ParamSlider.cpp
         source/DrivePanel.cpp
         source/InputPanel.cpp
         source/CompressorPanel.cpp
         source/CompressorGraph.cpp
+        source/CustomLookAndFeel.cpp
 )
 
 # Sets the include directories of the plugin project.
@@ -67,6 +82,7 @@ target_include_directories(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
         juce::juce_audio_utils
+        fontsLib
     PUBLIC
         juce::juce_recommended_config_flags
         juce::juce_recommended_lto_flags
