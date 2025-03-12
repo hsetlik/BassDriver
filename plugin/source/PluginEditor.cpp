@@ -10,6 +10,7 @@ BassDriverProcessorEditor::BassDriverProcessorEditor(
       dPanel(p.tree),
       cPanel(p.tree, p.core.getCompressor()) {
   juce::ignoreUnused(processorRef);
+  setLookAndFeel(&lookAndFeel);
   addAndMakeVisible(&inPanel);
   addAndMakeVisible(&dPanel);
   addAndMakeVisible(&cPanel);
@@ -18,7 +19,9 @@ BassDriverProcessorEditor::BassDriverProcessorEditor(
   setSize(1000, 620);
 }
 
-BassDriverProcessorEditor::~BassDriverProcessorEditor() {}
+BassDriverProcessorEditor::~BassDriverProcessorEditor() {
+  setLookAndFeel(nullptr);
+}
 
 void BassDriverProcessorEditor::paint(juce::Graphics& g) {
   // (Our component is opaque, so we must completely fill the background with a

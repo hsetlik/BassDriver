@@ -1,5 +1,6 @@
 #include "BassDriver/GUI/CustomLookAndFeel.h"
 #include "FontBinary.h"
+#include "juce_gui_basics/juce_gui_basics.h"
 
 namespace BDFont {
 static typeface_ptr loadTypeface(fontID id) {
@@ -54,3 +55,15 @@ juce::Font getFont(int id, float size) {
 }
 
 }  // namespace BDFont
+
+//=============================================================================
+
+static juce::LookAndFeel_V4::ColourScheme getScheme() {
+  auto scheme = juce::LookAndFeel_V4::getDarkColourScheme();
+  scheme.setUIColour(ui_color_t::windowBackground, BDColor::darkGrayBkgnd);
+  scheme.setUIColour(ui_color_t::widgetBackground, BDColor::fillGrayDark);
+  scheme.setUIColour(ui_color_t::defaultFill, BDColor::fillGrayMid);
+  return scheme;
+}
+
+BassDriverLnF::BassDriverLnF() : juce::LookAndFeel_V4(getScheme()) {}

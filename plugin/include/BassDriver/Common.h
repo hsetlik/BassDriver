@@ -4,6 +4,9 @@
  * */
 #include "Identifiers.h"
 #include "juce_audio_processors/juce_audio_processors.h"
+
+typedef juce::Colour color_t;
+
 constexpr float twoPi_f = juce::MathConstants<float>::twoPi;
 //
 // maybe we'll avoid writing 5 zillion 'prepare()' functions this way
