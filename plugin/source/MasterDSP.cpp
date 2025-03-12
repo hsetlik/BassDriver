@@ -6,6 +6,7 @@
 void BassDriverCore::init(double sampleRate) {
   sat.init(sampleRate);
   comp.init(sampleRate);
+  eq.init(sampleRate);
 }
 
 void BassDriverCore::updateParams(apvts& tree) {
@@ -16,10 +17,12 @@ void BassDriverCore::updateParams(apvts& tree) {
   const bool _order = readBoolTreeParam(tree, ID::stageOrder.toString());
   const bool _satOn = readBoolTreeParam(tree, ID::SAT_active.toString());
   const bool _compOn = readBoolTreeParam(tree, ID::COMP_active.toString());
+  const bool _eqOn = readBoolTreeParam(tree, ID::EQ_active.toString());
 
   inputGain = juce::Decibels::decibelsToGain(_preGain);
   dryGain = juce::Decibels::decibelsToGain(_dryLevel);
 
+  eqActive = _eqOn;
   // translate to config enum
   if (_satOn && _compOn) {
     config = _order ? stage_config::bothCompFirst : stage_config::bothSatFirst;
@@ -33,6 +36,7 @@ void BassDriverCore::updateParams(apvts& tree) {
 
   sat.updateParams(tree);
   comp.updateParams(tree);
+  eq.updateParams(tree);
 }
 
 void BassDriverCore::applyInputGain(float* buf, int numSamples) {
@@ -72,6 +76,9 @@ void BassDriverCore::processChunk(float* data, int numSamples) {
       break;
     default:
       break;
+  }
+  if (eqActive) {
+    eq.processChunk(data, numSamples);
   }
   addDryMix(data, numSamples);
 }

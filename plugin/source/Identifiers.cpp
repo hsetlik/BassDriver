@@ -61,7 +61,7 @@ apvts::ParameterLayout ID::getParameterLayout() {
   const float satInCenter = 15.0f;
   frange_t satInRange = rangeWithCenter(satInMin, satInMax, satInCenter);
   layout.add(std::make_unique<juce::AudioParameterFloat>(
-      ID::SAT_inGain.toString(), "Gain", satInRange, satInCenter));
+      ID::SAT_inGain.toString(), "Gain", satInRange, 0.0f));
 
   const float clipDefault = 0.125f;
   frange_t clipRange = rangeWithCenter(-1.0f, 1.0f, clipDefault);

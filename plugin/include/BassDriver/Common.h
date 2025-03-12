@@ -4,8 +4,10 @@
  * */
 #include "Identifiers.h"
 #include "juce_audio_processors/juce_audio_processors.h"
+#include "juce_graphics/juce_graphics.h"
 
 typedef juce::Colour color_t;
+typedef juce::Rectangle<float> rect_f;
 
 constexpr float twoPi_f = juce::MathConstants<float>::twoPi;
 //

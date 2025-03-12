@@ -2,6 +2,7 @@
 
 #include "SaturatorDSP.h"
 #include "CompressorDSP.h"
+#include "EqualizerDSP.h"
 
 // all the ways the two halves can be configured
 enum stage_config { bothCompFirst, bothSatFirst, compOnly, satOnly, neither };
@@ -12,12 +13,14 @@ class BassDriverCore {
 private:
   Saturator sat;
   Compressor comp;
+  SevenBandEQ eq;
 
   float dryBuf[MAX_BUF_SIZE];
   // params
   float inputGain;
   float dryGain;
   stage_config config = bothCompFirst;
+  bool eqActive;
 
 public:
   BassDriverCore() = default;

@@ -8,8 +8,10 @@ private:
   ParamToggle orderBtn;
   LabeledParamSlider dryLevelSlider;
   LabeledParamSlider preGainSlider;
+  ParamToggle eqBtn;
 
 public:
+  juce::ToggleButton showEqButton;
   InputPanel(apvts& state);
   void resized() override;
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(InputPanel)
