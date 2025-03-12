@@ -33,6 +33,15 @@ void SingleIIR::setFrequency(float freq) {
   }
 }
 
+void SingleIIR::setGain(float linearGain) {
+  constexpr float diffThresh = 0.001f;
+  if (std::fabs(params.gain - linearGain) > diffThresh) {
+    params.gain = linearGain;
+    if (filterPrepared)
+      prepareFilter();
+  }
+}
+
 float SingleIIR::process(float input) {
   if (smoothingActive) {
     smoothedFreq = smoother.smooth(targetFreq);

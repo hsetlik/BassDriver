@@ -85,10 +85,13 @@ public:
   void setParams(single_iir_params_t other);
   single_iir_params_t* getParams() { return &params; }
   void setFrequency(float freq);
+  void setGain(float linearGain);
   void prepare(double sampleFreq);
   float process(float input);
   void setFreqSmoothing(bool useSmoothing) { useFreqSmoothing = useSmoothing; }
 };
+
+//================================================================================================
 
 // enum for the different IIR filter topologies
 // provided in the dsp::FilterDesign juce module

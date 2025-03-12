@@ -51,11 +51,13 @@ target_sources(${PROJECT_NAME}
         ${INCLUDE_DIR}/Audio/CompressorDSP.h
         ${INCLUDE_DIR}/Audio/SaturatorDSP.h
         ${INCLUDE_DIR}/Audio/MasterDSP.h
+        ${INCLUDE_DIR}/Audio/EqualizerDSP.h
         ${INCLUDE_DIR}/Audio/ValueSmoother.h
         source/IIRFilter.cpp
         source/CompressorDSP.cpp
         source/SaturatorDSP.cpp
         source/MasterDSP.cpp
+        source/EqualizerDSP.cpp
 
 # GUI files------------------------------
         ${INCLUDE_DIR}/GUI/ParamSlider.h
@@ -63,12 +65,14 @@ target_sources(${PROJECT_NAME}
         ${INCLUDE_DIR}/GUI/InputPanel.h
         ${INCLUDE_DIR}/GUI/CompressorPanel.h
         ${INCLUDE_DIR}/GUI/CompressorGraph.h
+        ${INCLUDE_DIR}/GUI/EqualizerPanel.h
         ${INCLUDE_DIR}/GUI/CustomLookAndFeel.h
         source/ParamSlider.cpp
         source/DrivePanel.cpp
         source/InputPanel.cpp
         source/CompressorPanel.cpp
         source/CompressorGraph.cpp
+        source/EqualizerPanel.cpp
         source/CustomLookAndFeel.cpp
 )
 

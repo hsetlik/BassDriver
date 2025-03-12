@@ -30,6 +30,29 @@ apvts::ParameterLayout ID::getParameterLayout() {
   layout.add(std::make_unique<juce::AudioParameterBool>(
       ID::stageOrder.toString(), "Effect Order", true));
 
+  // Equalizer params-------------------------------------
+
+  layout.add(std::make_unique<juce::AudioParameterBool>(
+      ID::EQ_active.toString(), "EQ On", true));
+  const float eqBandDefault = 0.0f;
+  frange_t eqRange = rangeWithCenter(-15.0f, 15.0f, eqBandDefault);
+  layout.add(std::make_unique<juce::AudioParameterFloat>(
+      ID::EQ_band1.toString(), "50Hz", eqRange, eqBandDefault));
+  layout.add(std::make_unique<juce::AudioParameterFloat>(
+      ID::EQ_band2.toString(), "120Hz", eqRange, eqBandDefault));
+  layout.add(std::make_unique<juce::AudioParameterFloat>(
+      ID::EQ_band3.toString(), "400Hz", eqRange, eqBandDefault));
+  layout.add(std::make_unique<juce::AudioParameterFloat>(
+      ID::EQ_band4.toString(), "500Hz", eqRange, eqBandDefault));
+  layout.add(std::make_unique<juce::AudioParameterFloat>(
+      ID::EQ_band5.toString(), "800Hz", eqRange, eqBandDefault));
+  layout.add(std::make_unique<juce::AudioParameterFloat>(
+      ID::EQ_band6.toString(), "4.5kHz", eqRange, eqBandDefault));
+  layout.add(std::make_unique<juce::AudioParameterFloat>(
+      ID::EQ_band7.toString(), "10kHz", eqRange, eqBandDefault));
+  layout.add(std::make_unique<juce::AudioParameterFloat>(
+      ID::EQ_gain.toString(), "Gain", eqRange, eqBandDefault));
+
   // Saturation params---------------------------------------------
   layout.add(std::make_unique<juce::AudioParameterBool>(
       ID::SAT_active.toString(), "Drive On", true));

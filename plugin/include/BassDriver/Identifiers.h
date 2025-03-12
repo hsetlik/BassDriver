@@ -33,6 +33,17 @@ DECLARE_ID(dryLevel)
 DECLARE_ID(stageOrder)
 DECLARE_ID(preampGain)
 
+// EQ stage-----------------------
+DECLARE_ID(EQ_active)
+DECLARE_ID(EQ_band1)
+DECLARE_ID(EQ_band2)
+DECLARE_ID(EQ_band3)
+DECLARE_ID(EQ_band4)
+DECLARE_ID(EQ_band5)
+DECLARE_ID(EQ_band6)
+DECLARE_ID(EQ_band7)
+DECLARE_ID(EQ_gain)
+
 // Saturation stage-----------------------
 DECLARE_ID(SAT_active)
 DECLARE_ID(SAT_inGain)
