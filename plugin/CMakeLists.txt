@@ -53,11 +53,13 @@ target_sources(${PROJECT_NAME}
         ${INCLUDE_DIR}/Audio/MasterDSP.h
         ${INCLUDE_DIR}/Audio/EqualizerDSP.h
         ${INCLUDE_DIR}/Audio/ValueSmoother.h
+        ${INCLUDE_DIR}/Audio/RollingAverage.h
         source/IIRFilter.cpp
         source/CompressorDSP.cpp
         source/SaturatorDSP.cpp
         source/MasterDSP.cpp
         source/EqualizerDSP.cpp
+        source/RollingAverage.cpp
 
 # GUI files------------------------------
         ${INCLUDE_DIR}/GUI/ParamSlider.h
