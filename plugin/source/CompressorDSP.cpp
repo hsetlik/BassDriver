@@ -2,6 +2,14 @@
 #include <cmath>
 #include "BassDriver/Identifiers.h"
 #include "juce_audio_basics/juce_audio_basics.h"
+#include "juce_core/juce_core.h"
+
+// idk if this is actually useful but i'm gonna try it
+static float floatAbs(float input) {
+  static const uint32_t mask = 0x7FFFFFFF;
+  uint32_t bits = mask & *reinterpret_cast<uint32_t*>(&input);
+  return *reinterpret_cast<float*>(&bits);
+}
 
 float PeakDetector::process(float input) {
   static float prevInput = 0.0f;
@@ -11,7 +19,7 @@ float PeakDetector::process(float input) {
     currentPeak = 0.0f;
   }
   prevInput = input;
-  float mag = std::fabs(input);
+  float mag = floatAbs(input);
   if (mag > currentPeak)
     currentPeak = mag;
 #ifdef PEAK_INTERNAL_FILTER
@@ -33,49 +41,54 @@ float RMSMeter::process(float input) {
     ++windowPos;
   }
   currentSum += (input * input);
-  return windowLevelN1;
+  static float prevOutput = 0.0f;
+  if (!fequal(prevOutput, windowLevelN1)) {
+    prevOutput = flerp(windowLevelN1, prevOutput, 0.75f);
+  }
+  return prevOutput;
 }
 
 //----------------------------------------------------
-void EnvelopeFollower::setAttackHz(float norm) {
-  static frange_t atkRange(3.0f, 50.0f);
-  attackHz = atkRange.convertFrom0to1(1.0f - norm);
+static float coeffForTime(float secs, double sampleRate) {
+  static const double e = juce::MathConstants<double>::euler;
+  const double pwr = (-1.0 / sampleRate) / (double)secs;
+  return (float)std::pow(e, pwr);
 }
 
-void EnvelopeFollower::setReleaseHz(float norm) {
-  static frange_t rlsRange(1.0f, 40.0f);
-  releaseHz = rlsRange.convertFrom0to1(1.0f - norm);
+void EnvelopeFollower::setAttackNorm(float norm) {
+  static frange_t atkRange = rangeWithCenter(3.0f, 1800.0f, 35.0f);
+  auto newVal = atkRange.convertFrom0to1(norm) / 1000.0f;
+  if (!fequal(newVal, attackSecs)) {
+    attackSecs = newVal;
+    attackExp = coeffForTime(attackSecs, SampleRate::get());
+  }
+}
+
+void EnvelopeFollower::setReleaseNorm(float norm) {
+  static frange_t rlsRange = rangeWithCenter(5.0f, 3600.0f, 450.0f);
+  auto newVal = rlsRange.convertFrom0to1(norm) / 1000.0f;
+  if (!fequal(newVal, releaseSecs)) {
+    releaseSecs = newVal;
+    releaseExp = coeffForTime(releaseSecs, SampleRate::get());
+  }
 }
 
 void EnvelopeFollower::init(double sampleRate) {
-  auto aParams = *atkFilter.getParams();
-  aParams.cutoff = 35.0f;
-  aParams.order = 4;
-  atkFilter.setParams(aParams);
-  atkFilter.setFreqSmoothing(true);
-  atkFilter.prepare(sampleRate);
-
-  auto rParams = *rlsFilter.getParams();
-  rParams.cutoff = 35.0f;
-  rParams.order = 4;
-  rlsFilter.setParams(rParams);
-  rlsFilter.prepare(sampleRate);
-
-  chunkMeter.setWindowSize(500);
-}
-
-void EnvelopeFollower::update(float atk, float rls) {
-  setAttackHz(atk);
-  setReleaseHz(rls);
+  juce::ignoreUnused(sampleRate);
+  rms.setWindowSize(300);
+  setAttackNorm(0.5f);
+  setReleaseNorm(0.5f);
 }
 
 float EnvelopeFollower::process(float input) {
-  currentRMSLevel = chunkMeter.process(input);
-  float p = pd.process(input);
-  // float freq = chunkMeter.isGainIncreasing() ? attackHz : releaseHz;
-  // atkFilter.setFrequency(freq);
-  float aValue = raFilter.process(p);
-  return aValue;
+  currentRMSLevel = rms.process(input);
+  float s = pd.process(input);
+  if (s > lastOutput) {
+    lastOutput = flerp(s, lastOutput, attackExp);
+  } else {
+    lastOutput = flerp(s, lastOutput, releaseExp);
+  }
+  return lastOutput;
 }
 
 //=================================================================================
@@ -83,10 +96,10 @@ float EnvelopeFollower::process(float input) {
 void Compressor::init(double sampleRate) {
   ef.init(sampleRate);
   ef.update(0.125f, 0.3f);
-  inGain = 1.0f;
-  threshold = juce::Decibels::decibelsToGain(-20.0f);
+  inGainLin = 1.0f;
+  thresholdDb = -20.0f;
   ratio = 1.5f;
-  outGain = 1.0f;
+  outGainLin = 1.0f;
 }
 
 void Compressor::updateParams(apvts& tree) {
@@ -104,10 +117,10 @@ void Compressor::updateParams(apvts& tree) {
       tree.getRawParameterValue(ID::COMP_outGain.toString())->load();
 
   ef.update(_attack, _release);
-  inGain = juce::Decibels::decibelsToGain(_in);
-  threshold = juce::Decibels::decibelsToGain(_thresh);
+  inGainLin = juce::Decibels::decibelsToGain(_in);
+  thresholdDb = _thresh;
   ratio = _ratio;
-  outGain = juce::Decibels::decibelsToGain(_out);
+  outGainLin = juce::Decibels::decibelsToGain(_out);
 }
 
 void Compressor::processChunk(float* data, int numSamples) {
@@ -117,25 +130,34 @@ void Compressor::processChunk(float* data, int numSamples) {
 
 static float gainForLevel(float level, float thresh, float ratio) {
   if (level < thresh)
-    return 1.0f;
-  return thresh + (level - thresh) / ratio;
+    return 0.0f;
+  return 0.0f - ((level - thresh) * ratio);
 }
 
 float Compressor::processSample(float input) {
-  float s = input * inGain;
-  envLevel = ef.process(s);
-  currentGain = gainForLevel(envLevel, threshold, ratio);
-  return s * currentGain * outGain;
+  float s = input * inGainLin;
+  envLevel = juce::Decibels::gainToDecibels(ef.process(s));
+  float newDb = gainForLevel(envLevel, thresholdDb, ratio);
+  if (!fequal(newDb, currentDb)) {
+    currentDb = newDb;
+    currentGainLin = juce::Decibels::decibelsToGain(currentDb);
+  }
+  return s * currentGainLin * outGainLin;
 }
 
-float Compressor::currentGainReductionDB() {
-  return juce::Decibels::gainToDecibels(currentGain);
+float Compressor::currentGainDB() const {
+  return juce::Decibels::gainToDecibels(currentGainLin);
 }
 
-float Compressor::currentInputLevelNorm() {
+float Compressor::currentInputLevelNorm() const {
   return envLevel;
 }
 
-float Compressor::currentInputLevelDB() {
-  return juce::Decibels::gainToDecibels(envLevel);
+float Compressor::currentInputLevelDB() const {
+  float rmsNorm = ef.getRMSLevel() / 0.7071f;
+  return juce::Decibels::gainToDecibels(rmsNorm);
+}
+
+float Compressor::currentGainNorm() const {
+  return currentGainLin;
 }

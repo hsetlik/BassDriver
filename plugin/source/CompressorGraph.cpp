@@ -1,4 +1,5 @@
 #include "BassDriver/GUI/CompressorGraph.h"
+#include "BassDriver/Identifiers.h"
 
 CompressorGraph::CompressorGraph(Compressor* c)
     : comp(c), img(juce::Image::RGB, GRAPH_WIDTH, GRAPH_HEIGHT, true) {
@@ -12,7 +13,7 @@ CompressorGraph::CompressorGraph(Compressor* c)
 
 void CompressorGraph::timerCallback() {
   float level = comp->currentInputLevelDB();
-  float red = comp->currentGainReductionDB();
+  float red = comp->currentGainDB();
   updateImage(level, red);
   repaint();
 }
@@ -23,14 +24,20 @@ void CompressorGraph::paint(juce::Graphics& g) {
 
 //=======================================================
 
-void CompressorGraph::updateImage(float levelDb, float reductionDb) {
-  float nReduction = reductionDb / -24.0f;
-  const float redMax = 150.0f;
-  int iReduction = (int)(nReduction * redMax);
-  reductionPx.push(iReduction);
-  int iLevel = (int)((levelDb / -35.0f) * 80.0f);
-  levelPx.push(GRAPH_WIDTH - iLevel);
-  // update the image
+void CompressorGraph::updateImage(float levelDb, float gainDb) {
+  static const float redMax = -24.0f;
+  const float rNorm = std::min(gainDb, 0.0f) / redMax;
+  const int rPx = (int)(rNorm * 180.0f);
+  reductionPx.push(rPx);
+  // let's say we car about the input starting from
+  // about -30 dB
+  const float levelMin = -30.0f;
+  levelDb = std::clamp(levelDb, levelMin, 0.0f);
+  const float lNorm = (levelDb + 30.0f) / 30.0f;
+  const int lPx = (int)(lNorm * 180.0f) + 1;
+  levelPx.push(GRAPH_HEIGHT - lPx);
+
+  // redraw the image
   static juce::Colour bkgnd(105, 105, 105);
   static juce::Colour lvlColor(64, 224, 208);
   static juce::Colour compColor(250, 128, 114);

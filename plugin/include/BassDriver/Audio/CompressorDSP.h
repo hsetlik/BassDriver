@@ -9,7 +9,7 @@
  * value between its inputs previous two zero crossings
  * */
 
-#define PEAK_INTERNAL_FILTER
+// #define PEAK_INTERNAL_FILTER
 
 class PeakDetector {
 private:
@@ -18,7 +18,7 @@ private:
   RollingAverage filter;
 
 public:
-  PeakDetector() : filter(65) {}
+  PeakDetector() : filter(25) {}
   float process(float input);
 };
 
@@ -49,23 +49,26 @@ public:
 // envelope follower
 class EnvelopeFollower {
 private:
-  RMSMeter chunkMeter;
-  float currentRMSLevel;
+  RMSMeter rms;
   PeakDetector pd;
-  CascadeIIR atkFilter;
-  CascadeIIR rlsFilter;
-  RollingAverage raFilter;
-  float attackHz;
-  float releaseHz;
+  float currentRMSLevel = 0.0f;
+  float lastOutput = 0.0f;
+  float attackSecs = 1.0f;
+  float releaseSecs = 1.0f;
+  float attackExp;
+  float releaseExp;
   // helpers for the freq ranges
-  // here
-  void setAttackHz(float norm);
-  void setReleaseHz(float norm);
+  // and
+  void setAttackNorm(float norm);
+  void setReleaseNorm(float norm);
 
 public:
-  EnvelopeFollower() : raFilter(10) {}
+  EnvelopeFollower() = default;
   void init(double sampleRate);
-  void update(float atk, float rls);
+  void update(float atk, float rls) {
+    setAttackNorm(atk);
+    setReleaseNorm(rls);
+  }
   float process(float input);
   float getRMSLevel() const { return currentRMSLevel; }
 };
@@ -76,13 +79,14 @@ class Compressor {
 private:
   EnvelopeFollower ef;
   float envLevel = 0.0f;
-  float currentGain;
+  float currentGainLin;
+  float currentDb;
 
   // params
-  float inGain;
-  float threshold;
+  float inGainLin;
+  float thresholdDb;
   float ratio;
-  float outGain;
+  float outGainLin;
 
 public:
   Compressor() = default;
@@ -91,7 +95,8 @@ public:
   void processChunk(float* data, int numSamples);
   float processSample(float input);
   // getters for the compression graph
-  float currentInputLevelNorm();
-  float currentInputLevelDB();
-  float currentGainReductionDB();
+  float currentInputLevelNorm() const;
+  float currentInputLevelDB() const;
+  float currentGainDB() const;
+  float currentGainNorm() const;
 };

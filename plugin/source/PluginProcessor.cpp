@@ -78,10 +78,10 @@ void BassDriverAudioProcessor::changeProgramName(int index,
 
 void BassDriverAudioProcessor::prepareToPlay(double sampleRate,
                                              int samplesPerBlock) {
+  SampleRate::set(sampleRate);
   // Use this method as the place to do any pre-playback
   // initialisation that you need..
   juce::ignoreUnused(samplesPerBlock);
-  SampleRate::set(sampleRate);
   core.init(sampleRate);
 }
 

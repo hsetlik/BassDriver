@@ -44,9 +44,9 @@ void CompressorPanel::resized() {
   threshSlider.setBounds(0, y0 + dY, dX, dY);
   ratioSlider.setBounds(0, y0 + dY * 2, dX, dY);
   // bottom row
-  attackSlider.setBounds(dX, y0 + dY * 2, dX, dY);
-  releaseSlider.setBounds(dX * 2, y0 + dY * 2, dX, dY);
-  outGainSlider.setBounds(dX * 3, y0 + dY * 2, dX, dY);
+  attackSlider.setBounds(0, y0 + dY * 3, dX, dY);
+  releaseSlider.setBounds(dX, y0 + dY * 3, dX, dY);
+  outGainSlider.setBounds(dX * 2, y0 + dY * 3, dX, dY);
   // graph
   // graph dimensions are 400 x 360
   graph.setBounds(dX, y0, 2 * dX, 3 * dY);

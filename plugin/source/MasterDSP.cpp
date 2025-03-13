@@ -56,7 +56,7 @@ void BassDriverCore::addDryMix(float* buf, int numSamples) {
 
 void BassDriverCore::processChunk(float* data, int numSamples) {
   applyInputGain(data, numSamples);
-  copyDryBuffer(data, numSamples);
+  // copyDryBuffer(data, numSamples);
   switch (config) {
     case stage_config::bothCompFirst:
       comp.processChunk(data, numSamples);
@@ -80,5 +80,5 @@ void BassDriverCore::processChunk(float* data, int numSamples) {
   if (eqActive) {
     eq.processChunk(data, numSamples);
   }
-  addDryMix(data, numSamples);
+  // addDryMix(data, numSamples);
 }
