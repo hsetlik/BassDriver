@@ -25,7 +25,7 @@ void Saturator::updateParams(apvts& tree) {
   const float _freq =
       tree.getRawParameterValue(ID::SAT_outFilter.toString())->load();
   const float _out =
-      tree.getRawParameterValue(ID::SAT_inGain.toString())->load();
+      tree.getRawParameterValue(ID::SAT_outGain.toString())->load();
 
   inputGain = juce::Decibels::decibelsToGain(_in);
   clipAmt = _clip;
