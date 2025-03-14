@@ -101,11 +101,19 @@ apvts::ParameterLayout ID::getParameterLayout() {
       ID::COMP_thresh.toString(), "Threshold", threshRange, threshDefault));
 
   const float ratioMin = 0.85f;
-  const float ratioMax = 10.0f;
+  const float ratioMax = 5.0f;
+  const float ratioCenter = 3.0f;
   const float ratioDefault = 1.5f;
-  frange_t ratioRange = rangeWithCenter(ratioMin, ratioMax, ratioDefault);
+  frange_t ratioRange = rangeWithCenter(ratioMin, ratioMax, ratioCenter);
   layout.add(std::make_unique<juce::AudioParameterFloat>(
       ID::COMP_ratio.toString(), "Ratio", ratioRange, ratioDefault));
+
+  const float kneeMin = 0.0f;
+  const float kneeMax = 3.0f;
+  const float kneeDefault = 0.5f;
+  frange_t kneeRange = rangeWithCenter(kneeMin, kneeMax, kneeDefault);
+  layout.add(std::make_unique<juce::AudioParameterFloat>(
+      ID::COMP_knee.toString(), "Knee", kneeRange, kneeDefault));
 
   const float atkDefault = 0.125f;
   frange_t atkRange = rangeWithCenter(0.0f, 1.0f, atkDefault);

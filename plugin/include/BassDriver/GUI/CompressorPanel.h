@@ -11,13 +11,14 @@ private:
   LabeledParamSlider inGainSlider;
   LabeledParamSlider threshSlider;
   LabeledParamSlider ratioSlider;
+  LabeledParamSlider kneeSlider;
   LabeledParamSlider attackSlider;
   LabeledParamSlider releaseSlider;
   LabeledParamSlider outGainSlider;
 
-  LabeledParamSlider* sliders[6] = {&inGainSlider,  &threshSlider,
-                                    &ratioSlider,   &attackSlider,
-                                    &releaseSlider, &outGainSlider};
+  LabeledParamSlider* sliders[7] = {
+      &inGainSlider, &threshSlider,  &ratioSlider,  &kneeSlider,
+      &attackSlider, &releaseSlider, &outGainSlider};
 
 public:
   CompressorPanel(apvts& state, Compressor* comp);

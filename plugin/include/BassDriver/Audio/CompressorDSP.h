@@ -85,6 +85,7 @@ private:
   // params
   float inGainLin;
   float thresholdDb;
+  float kneeWidthDb;
   float ratio;
   float outGainLin;
 

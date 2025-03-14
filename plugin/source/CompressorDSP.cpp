@@ -115,10 +115,13 @@ void Compressor::updateParams(apvts& tree) {
       tree.getRawParameterValue(ID::COMP_thresh.toString())->load();
   const float _out =
       tree.getRawParameterValue(ID::COMP_outGain.toString())->load();
+  const float _knee =
+      tree.getRawParameterValue(ID::COMP_knee.toString())->load();
 
   ef.update(_attack, _release);
   inGainLin = juce::Decibels::decibelsToGain(_in);
   thresholdDb = _thresh;
+  kneeWidthDb = _knee;
   ratio = _ratio;
   outGainLin = juce::Decibels::decibelsToGain(_out);
 }
@@ -134,10 +137,23 @@ static float gainForLevel(float level, float thresh, float ratio) {
   return 0.0f - ((level - thresh) * ratio);
 }
 
+static float gainForLevel_knee(float level,
+                               float thresh,
+                               float knee,
+                               float ratio) {
+  if (level < thresh)
+    return 0.0f;
+  else if (level < (thresh + knee)) {
+    const float r = ((level - thresh) / knee) * ratio;
+    return 0.0f - ((level - thresh) * r);
+  }
+  return 0.0f - ((level - thresh) * ratio);
+}
+
 float Compressor::processSample(float input) {
   float s = input * inGainLin;
   envLevel = juce::Decibels::gainToDecibels(ef.process(s));
-  float newDb = gainForLevel(envLevel, thresholdDb, ratio);
+  float newDb = gainForLevel_knee(envLevel, thresholdDb, kneeWidthDb, ratio);
   if (!fequal(newDb, currentDb)) {
     currentDb = newDb;
     currentGainLin = juce::Decibels::decibelsToGain(currentDb);
